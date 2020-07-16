@@ -9,12 +9,12 @@ Please make sure to credit me (and any of this plugin's contributing coders)
 if you're using this plugin in your game (include the names and webpage links).
 
 @param Font Change Settings
-@type struct<CGT_NaBaFoCh_FontChangeSettings>[]
+@type struct<CGTNaBaFoChFontChangeSettings>[]
 @default []
 
 */
 
-/*~struct~CGT-NaBaFoCh-FontChangeSettings:
+/*~struct~CGTNaBaFoChFontChangeSettings:
 
 @param Nametag
 @default Harold
@@ -28,22 +28,34 @@ if you're using this plugin in your game (include the names and webpage links).
 (function () {
     'use strict';
 
-    let oldNameRefresh = Window_NameBox.prototype.refresh;
-    Window_NameBox.prototype.refresh = NewNameBoxRefresh;
-    // This is to make it easier to access the name text as written in
-    // the Show Text events
-    function NewNameBoxRefresh(text, position) {
-        this.rawNameText = text;
-        oldNameRefresh.call(this, text, position);
-    }
-    let oldNameFontReset = Window_NameBox.prototype.resetFontSettings;
-    Window_NameBox.prototype.resetFontSettings = NewNameFontReset;
-    // Works like the message box's font-resetter, but makes sure not to step
-    // on other namebox-altering plugins' toes... hopefully
-    function NewNameFontReset() {
-        oldNameFontReset.call(this);
-        //ChangeFontAsAppropriate.call(this);
-    }
+    let old = {
+        initialize: Window_NameBox.prototype.initialize,
+        refresh: Window_NameBox.prototype.refresh,
+        resetFontSettings: Window_NameBox.prototype.resetFontSettings,
+    };
+    let Event = CGT.Core.Utils.Event;
+    let nameBoxChanges = {
+        nameText: '',
+        prevNameText: '',
+        DisplayedNewName: new Event(2),
+        ShowedUp: new Event(),
+        Deactivated: new Event(),
+        refresh(nameText, position) {
+            this.UpdateNameText(nameText);
+            old.refresh.call(this, nameText, position);
+        },
+        UpdateNameText(newNameText) {
+            this.nameText = newNameText;
+            if (this.prevNameText !== this.nameText)
+                this.DisplayedNewName.Invoke(this.prevNameText, this.nameText);
+            this.prevNameText = this.nameText;
+        },
+        resetFontSettings() {
+            old.resetFontSettings.call(this);
+            //ChangeFontAsAppropriate.call(this);
+        },
+    };
+    Object.assign(Window_NameBox.prototype, nameBoxChanges);
 
     class FontChangeSettings {
         get Nametag() { return this.nametag; }
@@ -78,45 +90,6 @@ if you're using this plugin in your game (include the names and webpage links).
     }
     FontChangeSettings.Null = Object.freeze(new FontChangeSettings());
 
-    function NameWindowIsActive() {
-        return Yanfly.nameWindow != null && Yanfly.nameWindow.active;
-    }
-    function ChangeFontAsAppropriate() {
-        if (NameWindowIsActive() && FontAdjusterIsValid(this.fontAdjuster))
-            this.fontAdjuster.ApplyTo(this.contents);
-    }
-    function FontAdjusterIsValid(fontAdjuster) {
-        return fontAdjuster != FontChangeSettings.Null && fontAdjuster != null;
-    }
-
-    let oldStartMessage = Window_Message.prototype.startMessage;
-    Window_Message.prototype.startMessage = NewStartMessage;
-    // This is to register change settings to apply for (usually) later, 
-    // when it's time to reset the font. Better than checking for settings
-    // during the font-resetting, which would needlessly add a lot of overhead
-    function NewStartMessage() {
-        oldStartMessage.call(this);
-        this.fontAdjuster = GetFontChangeSettingsFor.call(this);
-        Yanfly.nameWindow.fontAdjuster = this.fontAdjuster;
-    }
-    function GetFontChangeSettingsFor() {
-        let matchingSettings = undefined;
-        if (NameWindowIsActive()) {
-            let nameText = Yanfly.nameWindow.rawNameText;
-            let fcSettings = NaBaFoCh.registeredSettings;
-            matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
-        }
-        return matchingSettings || FontChangeSettings.Null;
-    }
-    let oldMessageFontReset = Window_Message.prototype.resetFontSettings;
-    Window_Message.prototype.resetFontSettings = NewMessageFontReset;
-    // As mentioned before, it's here that the font gets changed based
-    // on the nametag
-    function NewMessageFontReset() {
-        oldMessageFontReset.call(this);
-        ChangeFontAsAppropriate.call(this);
-    }
-
     let pluginName = "CGT_NametagBasedFontChangerMV";
     let params = PluginManager.parameters(pluginName);
     let allInStringifiedArr = params["Font Change Settings"];
@@ -127,20 +100,54 @@ if you're using this plugin in your game (include the names and webpage links).
         FontChangeSettings: FontChangeSettings,
     };
 
-    /*:
-     * @plugindesc Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.
-     * @author CG-Tespy – https://github.com/CG-Tespy
-     * @help This is version 1.01.01 of this plugin. For RMMV versions 1.5.1 and above.
-    Requires the CGT CoreEngine and Yanfly MessageCore plugins to work.
+    function NameWindowIsActive() {
+        return Yanfly.nameWindow != null && Yanfly.nameWindow.active;
+    }
+    function ChangeFontAsAppropriate() {
+        if (FontAdjusterIsValid(this.fontAdjuster))
+            this.fontAdjuster.ApplyTo(this.contents);
+    }
+    function FontAdjusterIsValid(fontAdjuster) {
+        return fontAdjuster != FontChangeSettings.Null && fontAdjuster != null;
+    }
+    function GetFontChangeSettingsFor(nameText) {
+        let matchingSettings = undefined;
+        if (NameWindowIsActive()) {
+            let fcSettings = NaBaFoCh.registeredSettings;
+            matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
+        }
+        return matchingSettings || FontChangeSettings.Null;
+    }
 
-    Please make sure to credit me (and any of this plugin's contributing coders)
-    if you're using this plugin in your game (include the names and webpage links).
+    let old$1 = {
+        startMessage: Window_Message.prototype.startMessage,
+        resetFontSettings: Window_Message.prototype.resetFontSettings,
+        createSubWindows: Window_Message.prototype.createSubWindows,
+    };
+    let messageBoxChanges = {
+        fontAdjuster: FontChangeSettings.Null,
+        createSubWindows() {
+            old$1.createSubWindows.call(this);
+            this.ListenForNameWindowEvents();
+        },
+        ListenForNameWindowEvents() {
+            let nameWindow = Yanfly.nameWindow;
+            nameWindow.DisplayedNewName.AddListener(this.OnDisplayNewName, this);
+            nameWindow.Deactivated.AddListener(this.OnNameWindowDeactivated, this);
+        },
+        OnDisplayNewName(oldName, newName) {
+            this.fontAdjuster = GetFontChangeSettingsFor(newName);
+        },
+        OnNameWindowDeactivated() {
+            this.fontAdjuster = FontChangeSettings.Null;
+        },
+        resetFontSettings() {
+            old$1.resetFontSettings.call(this);
+            ChangeFontAsAppropriate.call(this);
+        },
+    };
+    Object.assign(Window_Message.prototype, messageBoxChanges);
 
-    @param Font Change Settings
-    @type struct<CGT_NaBaFoCh_FontChangeSettings>[]
-    @default []
-
-    */
     let pluginNamespace = {
         NaBaFoCh: NaBaFoCh,
     };

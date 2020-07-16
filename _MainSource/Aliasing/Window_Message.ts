@@ -1,42 +1,47 @@
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
 import { NaBaFoCh } from '../_CGT_NametagBasedFontChangerMV_Setup';
-import { NameWindowIsActive, ChangeFontAsAppropriate } from './_Shared';
+import { NameWindowIsActive, ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
 
-let oldStartMessage = Window_Message.prototype.startMessage;
-Window_Message.prototype.startMessage = NewStartMessage;
-
-// This is to register change settings to apply for (usually) later, 
-// when it's time to reset the font. Better than checking for settings
-// during the font-resetting, which would needlessly add a lot of overhead
-function NewStartMessage()
+let old = 
 {
-    oldStartMessage.call(this);
-    this.fontAdjuster = GetFontChangeSettingsFor.call(this);
-    Yanfly.nameWindow.fontAdjuster = this.fontAdjuster;
-}
+    startMessage: Window_Message.prototype.startMessage,
+    resetFontSettings: Window_Message.prototype.resetFontSettings,
+    createSubWindows: Window_Message.prototype.createSubWindows,
+};
 
-function GetFontChangeSettingsFor(): FontChangeSettings
+let messageBoxChanges = 
 {
-    let matchingSettings: FontChangeSettings = undefined;
+    fontAdjuster: FontChangeSettings.Null,
 
-    if (NameWindowIsActive())
+    createSubWindows()
     {
-        let nameText = Yanfly.nameWindow.rawNameText;
-        let fcSettings = NaBaFoCh.registeredSettings;
-        matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
-    }
+        old.createSubWindows.call(this);
+        this.ListenForNameWindowEvents();
+    },
 
-    return matchingSettings || FontChangeSettings.Null;
-}
+    ListenForNameWindowEvents()
+    {
+        let nameWindow = Yanfly.nameWindow;
+        nameWindow.DisplayedNewName.AddListener(this.OnDisplayNewName, this);
+        nameWindow.Deactivated.AddListener(this.OnNameWindowDeactivated, this);
+    },
 
-let oldMessageFontReset = Window_Message.prototype.resetFontSettings;
-Window_Message.prototype.resetFontSettings = NewMessageFontReset;
+    OnDisplayNewName(oldName: string, newName: string)
+    {
+        this.fontAdjuster = GetFontChangeSettingsFor(newName);
+    },
 
-// As mentioned before, it's here that the font gets changed based
-// on the nametag
-function NewMessageFontReset()
-{
-    oldMessageFontReset.call(this);
-    ChangeFontAsAppropriate.call(this);
-}
+    OnNameWindowDeactivated()
+    {
+        this.fontAdjuster = FontChangeSettings.Null;
+    },
 
+    resetFontSettings()
+    {
+        old.resetFontSettings.call(this);
+        ChangeFontAsAppropriate.call(this);
+    },
+    
+};
+
+Object.assign(Window_Message.prototype, messageBoxChanges);

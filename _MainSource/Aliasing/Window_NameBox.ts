@@ -1,23 +1,43 @@
 import { ChangeFontAsAppropriate } from './_Shared';
 
-let oldNameRefresh = Window_NameBox.prototype.refresh;
-Window_NameBox.prototype.refresh = NewNameBoxRefresh;
-
-// This is to make it easier to access the name text as written in
-// the Show Text events
-function NewNameBoxRefresh(text: string, position: PIXI.Point | PIXI.ObservablePoint)
+let old = 
 {
-    this.rawNameText = text; 
-    oldNameRefresh.call(this, text, position);
-}
+    initialize: Window_NameBox.prototype.initialize,
+    refresh: Window_NameBox.prototype.refresh,
+    resetFontSettings: Window_NameBox.prototype.resetFontSettings,
+};
 
-let oldNameFontReset = Window_NameBox.prototype.resetFontSettings;
-Window_NameBox.prototype.resetFontSettings = NewNameFontReset;
+let Event = CGT.Core.Utils.Event;
 
-// Works like the message box's font-resetter, but makes sure not to step
-// on other namebox-altering plugins' toes... hopefully
-function NewNameFontReset()
+let nameBoxChanges = 
 {
-    oldNameFontReset.call(this);
-    //ChangeFontAsAppropriate.call(this);
-}
+    nameText: '',
+    prevNameText: '',
+    DisplayedNewName: new Event(2),
+    ShowedUp: new Event(),
+    Deactivated: new Event(),
+
+    refresh(nameText: string, position: PIXI.Point | PIXI.ObservablePoint): void
+    {
+        this.UpdateNameText(nameText);
+        old.refresh.call(this, nameText, position);
+    },
+
+    UpdateNameText(newNameText: string): void
+    {
+        this.nameText = newNameText;
+
+        if (this.prevNameText !== this.nameText)
+            this.DisplayedNewName.Invoke(this.prevNameText, this.nameText);
+        
+        this.prevNameText = this.nameText;
+    },
+
+    resetFontSettings()
+    {
+        old.resetFontSettings.call(this);
+        //ChangeFontAsAppropriate.call(this);
+    },
+};
+
+Object.assign(Window_NameBox.prototype, nameBoxChanges);

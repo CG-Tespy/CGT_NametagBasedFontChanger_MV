@@ -8,11 +8,11 @@ Please make sure to credit me (and any of this plugin's contributing coders)
 if you're using this plugin in your game (include the names and webpage links).
 
 @param Font Change Settings
-@type struct<CGT_NaBaFoCh_FontChangeSettings>[]
+@type struct<CGT-NaBaFoCh-FontChangeSettings>[]
 @default []
 
 */
-/*~struct~CGT_NaBaFoCh_FontChangeSettings:
+/*~struct~CGT-NaBaFoCh-FontChangeSettings:
 
 @param Nametag
 @default Harold
