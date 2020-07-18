@@ -4,6 +4,7 @@ let old = {
     initialize: Window_NameBox.prototype.initialize,
     refresh: Window_NameBox.prototype.refresh,
     resetFontSettings: Window_NameBox.prototype.resetFontSettings,
+    deactivate: Window_NameBox.prototype.deactivate,
 };
 let Event = CGT.Core.Utils.Event;
 let nameBoxChanges = {
@@ -16,6 +17,10 @@ let nameBoxChanges = {
         old.initialize.call(this, parentWindow);
         this.DisplayedNewName.AddListener(this.OnNameTextChanged, this);
         this.Deactivated.AddListener(this.OnDeactivated, this);
+    },
+    deactivate() {
+        old.deactivate.call(this);
+        this.Deactivated.Invoke();
     },
     OnNameTextChanged(oldName, newName) {
         this.fontAdjuster = GetFontChangeSettingsFor(newName);

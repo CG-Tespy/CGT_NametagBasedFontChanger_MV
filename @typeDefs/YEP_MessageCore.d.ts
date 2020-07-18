@@ -1,3 +1,5 @@
+// Only to be used for the development of this plugin; this is far from a proper
+// type definitions file for any of Yanfly's work.
 declare class Window_NameBox extends Window_Base
 {
     nameText: string; 
@@ -12,6 +14,5 @@ declare class Window_NameBox extends Window_Base
 
 declare namespace Yanfly
 {
-    
     let nameWindow: Window_NameBox;
 }
