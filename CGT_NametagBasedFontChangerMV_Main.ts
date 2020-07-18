@@ -1,4 +1,3 @@
-
 /*:
  * @plugindesc Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.
  * @author CG-Tespy – https://github.com/CG-Tespy
@@ -22,6 +21,8 @@ if you're using this plugin in your game (include the names and webpage links).
 
 @param Font Family
 @default GameFont
+@desc Family name of the font that the message box will switch to, when
+the name window displays the corresponding name.
 
 */
 

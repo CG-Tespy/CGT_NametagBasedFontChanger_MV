@@ -20,6 +20,8 @@ if you're using this plugin in your game (include the names and webpage links).
 
 @param Font Family
 @default GameFont
+@desc Family name of the font that the message box will switch to, when
+the name window displays the corresponding name.
 
 */
 import { NaBaFoCh } from './_MainSource/_CGT_NametagBasedFontChangerMV_Setup';
