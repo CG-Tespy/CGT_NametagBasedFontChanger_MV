@@ -1,7 +1,7 @@
 /*:
  * @plugindesc Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.
  * @author CG-Tespy – https://github.com/CG-Tespy
- * @help This is version 1.01.01 of this plugin. For RMMV versions 1.5.1 and above.
+ * @help This is version 1.01.01 of this plugin. Tested with RMMV version 1.6.2.
 Requires the CGT CoreEngine and Yanfly MessageCore plugins to work.
 
 Please make sure to credit me (and any of this plugin's contributing coders)
