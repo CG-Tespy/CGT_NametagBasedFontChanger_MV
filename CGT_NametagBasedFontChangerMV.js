@@ -1,61 +1,5 @@
-
-/*:
-* @plugindesc Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.
-* @author CG-Tespy – https://github.com/CG-Tespy
-* @help This is version 1.01.01 of this plugin. For RMMV versions 1.5.1 and above.
-Requires the CGT CoreEngine and Yanfly MessageCore plugins to work.
-
-Please make sure to credit me (and any of this plugin's contributing coders)
-if you're using this plugin in your game (include the names and webpage links).
-
-@param Font Change Settings
-@type struct<CGTNaBaFoChFontChangeSettings>[]
-@default []
-
-*/
-
-/*~struct~CGTNaBaFoChFontChangeSettings:
-
-@param Nametag
-@default Harold
-@desc Name in the nametag that will trigger this font change.
-
-@param Font Family
-@default GameFont
-
-*/
-
 (function () {
     'use strict';
-
-    let old = {
-        initialize: Window_NameBox.prototype.initialize,
-        refresh: Window_NameBox.prototype.refresh,
-        resetFontSettings: Window_NameBox.prototype.resetFontSettings,
-    };
-    let Event = CGT.Core.Utils.Event;
-    let nameBoxChanges = {
-        nameText: '',
-        prevNameText: '',
-        DisplayedNewName: new Event(2),
-        ShowedUp: new Event(),
-        Deactivated: new Event(),
-        refresh(nameText, position) {
-            this.UpdateNameText(nameText);
-            old.refresh.call(this, nameText, position);
-        },
-        UpdateNameText(newNameText) {
-            this.nameText = newNameText;
-            if (this.prevNameText !== this.nameText)
-                this.DisplayedNewName.Invoke(this.prevNameText, this.nameText);
-            this.prevNameText = this.nameText;
-        },
-        resetFontSettings() {
-            old.resetFontSettings.call(this);
-            //ChangeFontAsAppropriate.call(this);
-        },
-    };
-    Object.assign(Window_NameBox.prototype, nameBoxChanges);
 
     class FontChangeSettings {
         get Nametag() { return this.nametag; }
@@ -100,24 +44,59 @@ if you're using this plugin in your game (include the names and webpage links).
         FontChangeSettings: FontChangeSettings,
     };
 
-    function NameWindowIsActive() {
-        return Yanfly.nameWindow != null && Yanfly.nameWindow.active;
-    }
     function ChangeFontAsAppropriate() {
         if (FontAdjusterIsValid(this.fontAdjuster))
             this.fontAdjuster.ApplyTo(this.contents);
     }
     function FontAdjusterIsValid(fontAdjuster) {
-        return fontAdjuster != FontChangeSettings.Null && fontAdjuster != null;
+        return fontAdjuster !== FontChangeSettings.Null && fontAdjuster != null;
     }
     function GetFontChangeSettingsFor(nameText) {
         let matchingSettings = undefined;
-        if (NameWindowIsActive()) {
-            let fcSettings = NaBaFoCh.registeredSettings;
-            matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
-        }
+        let fcSettings = NaBaFoCh.registeredSettings;
+        matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
         return matchingSettings || FontChangeSettings.Null;
     }
+
+    let old = {
+        initialize: Window_NameBox.prototype.initialize,
+        refresh: Window_NameBox.prototype.refresh,
+        resetFontSettings: Window_NameBox.prototype.resetFontSettings,
+    };
+    let Event = CGT.Core.Utils.Event;
+    let nameBoxChanges = {
+        nameText: '',
+        prevNameText: '',
+        DisplayedNewName: new Event(2),
+        ShowedUp: new Event(),
+        Deactivated: new Event(),
+        initialize(parentWindow) {
+            old.initialize.call(this, parentWindow);
+            this.DisplayedNewName.AddListener(this.OnNameTextChanged, this);
+            this.Deactivated.AddListener(this.OnDeactivated, this);
+        },
+        OnNameTextChanged(oldName, newName) {
+            this.fontAdjuster = GetFontChangeSettingsFor(newName);
+        },
+        OnDeactivated() {
+            this.fontAdjuster = FontChangeSettings.Null;
+        },
+        refresh(nameText, position) {
+            this.UpdateNameText(nameText);
+            return old.refresh.call(this, nameText, position);
+        },
+        UpdateNameText(newNameText) {
+            this.nameText = newNameText;
+            if (this.prevNameText !== this.nameText)
+                this.DisplayedNewName.Invoke(this.prevNameText, this.nameText);
+            this.prevNameText = this.nameText;
+        },
+        resetFontSettings() {
+            old.resetFontSettings.call(this);
+            ChangeFontAsAppropriate.call(this);
+        },
+    };
+    Object.assign(Window_NameBox.prototype, nameBoxChanges);
 
     let old$1 = {
         startMessage: Window_Message.prototype.startMessage,
@@ -148,6 +127,20 @@ if you're using this plugin in your game (include the names and webpage links).
     };
     Object.assign(Window_Message.prototype, messageBoxChanges);
 
+    /*:
+     * @plugindesc Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.
+     * @author CG-Tespy – https://github.com/CG-Tespy
+     * @help This is version 1.01.01 of this plugin. For RMMV versions 1.5.1 and above.
+    Requires the CGT CoreEngine and Yanfly MessageCore plugins to work.
+
+    Please make sure to credit me (and any of this plugin's contributing coders)
+    if you're using this plugin in your game (include the names and webpage links).
+
+    @param Font Change Settings
+    @type struct<CGTNaBaFoChFontChangeSettings>[]
+    @default []
+
+    */
     let pluginNamespace = {
         NaBaFoCh: NaBaFoCh,
     };

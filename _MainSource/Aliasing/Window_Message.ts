@@ -1,6 +1,5 @@
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
-import { NaBaFoCh } from '../_CGT_NametagBasedFontChangerMV_Setup';
-import { NameWindowIsActive, ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
+import { ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
 
 let old = 
 {
@@ -13,30 +12,30 @@ let messageBoxChanges =
 {
     fontAdjuster: FontChangeSettings.Null,
 
-    createSubWindows()
+    createSubWindows(): void
     {
         old.createSubWindows.call(this);
         this.ListenForNameWindowEvents();
     },
 
-    ListenForNameWindowEvents()
+    ListenForNameWindowEvents(): void
     {
         let nameWindow = Yanfly.nameWindow;
         nameWindow.DisplayedNewName.AddListener(this.OnDisplayNewName, this);
         nameWindow.Deactivated.AddListener(this.OnNameWindowDeactivated, this);
     },
 
-    OnDisplayNewName(oldName: string, newName: string)
+    OnDisplayNewName(oldName: string, newName: string): void
     {
         this.fontAdjuster = GetFontChangeSettingsFor(newName);
     },
 
-    OnNameWindowDeactivated()
+    OnNameWindowDeactivated(): void
     {
         this.fontAdjuster = FontChangeSettings.Null;
     },
 
-    resetFontSettings()
+    resetFontSettings(): void
     {
         old.resetFontSettings.call(this);
         ChangeFontAsAppropriate.call(this);

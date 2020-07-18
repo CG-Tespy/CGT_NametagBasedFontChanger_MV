@@ -1,4 +1,5 @@
-import { ChangeFontAsAppropriate } from './_Shared';
+import { ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
+import { FontChangeSettings } from '../Structures/FontChangeSettings';
 
 let old = 
 {
@@ -17,10 +18,27 @@ let nameBoxChanges =
     ShowedUp: new Event(),
     Deactivated: new Event(),
 
+    initialize(parentWindow: Window_Message)
+    {
+        old.initialize.call(this, parentWindow);
+        this.DisplayedNewName.AddListener(this.OnNameTextChanged, this);
+        this.Deactivated.AddListener(this.OnDeactivated, this);
+    },
+
+    OnNameTextChanged(oldName: string, newName: string)
+    {
+        this.fontAdjuster = GetFontChangeSettingsFor(newName);
+    },
+
+    OnDeactivated()
+    {
+        this.fontAdjuster = FontChangeSettings.Null;
+    },
+
     refresh(nameText: string, position: PIXI.Point | PIXI.ObservablePoint): void
     {
         this.UpdateNameText(nameText);
-        old.refresh.call(this, nameText, position);
+        return old.refresh.call(this, nameText, position);
     },
 
     UpdateNameText(newNameText: string): void
@@ -36,7 +54,7 @@ let nameBoxChanges =
     resetFontSettings()
     {
         old.resetFontSettings.call(this);
-        //ChangeFontAsAppropriate.call(this);
+        ChangeFontAsAppropriate.call(this);
     },
 };
 

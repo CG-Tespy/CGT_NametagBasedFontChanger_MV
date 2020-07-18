@@ -1,11 +1,6 @@
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
 import { NaBaFoCh } from '../NaBaFoCh';
 
-export function NameWindowIsActive(): boolean
-{
-    return Yanfly.nameWindow != null && Yanfly.nameWindow.active;
-}
-
 export function ChangeFontAsAppropriate()
 {
     if (FontAdjusterIsValid(this.fontAdjuster))
@@ -14,7 +9,7 @@ export function ChangeFontAsAppropriate()
 
 export function FontAdjusterIsValid(fontAdjuster: FontChangeSettings)
 {
-    return fontAdjuster != FontChangeSettings.Null && fontAdjuster != null;
+    return fontAdjuster !== FontChangeSettings.Null && fontAdjuster != null;
 }
 
 export function GetFontChangeSettingsFor(nameText: string)
