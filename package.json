@@ -1,7 +1,7 @@
 {
   "name": "cgt-nametag-based-font-changer-mv",
   "description": "Lets you make it so message box fonts automatically change based on the Yanfly MessageCore nametags they're holding.",
-  "version": "1.01.01",
+  "version": "1.01.03",
   "author": "CG-Tespy",
   "repository": {
     "type": "git",
