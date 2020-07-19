@@ -1,5 +1,6 @@
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
 import { NaBaFoCh } from '../NaBaFoCh';
+let ArrayEx = CGT.Core.Extensions.ArrayEx;
 
 export function ChangeFontAsAppropriate()
 {
@@ -16,7 +17,13 @@ export function GetFontChangeSettingsFor(nameText: string)
 {
     let matchingSettings: FontChangeSettings = undefined;
     let fcSettings = NaBaFoCh.registeredSettings;
-    matchingSettings = fcSettings.find(settings => settings.Nametag === nameText);
+    matchingSettings = ArrayEx.Find(fcSettings, SettingsMatchNametag);
+
+    function SettingsMatchNametag(settings: FontChangeSettings)
+    {
+        return settings.Nametag === nameText;
+    }
     
     return matchingSettings || FontChangeSettings.Null;
 }
+
