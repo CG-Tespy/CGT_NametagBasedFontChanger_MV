@@ -10,6 +10,9 @@ to work.
 Please make sure to credit me (and any of this plugin's contributing coders)
 if you're using this plugin in your game (include the names and webpage links).
 
+Other contributors:
+FeniXTools - FeniXEngine Contributors
+
 @param Font Change Settings
 @type struct<CGTNaBaFoChFontChangeSettings>[]
 @default []
