@@ -20,21 +20,17 @@ export class FontChangeSettings
         return newSetting;
     }
 
-    static ArrFromPluginParamArr(stringifiedArr: string): FontChangeSettings[]
+    static ArrFromPluginParamArr(paramArr: FontChangeSettingParam[]): FontChangeSettings[]
     {
-        let arrWithStringifiedSettings: string[] = JSON.parse(stringifiedArr); 
-        let rawSettings: FontChangeSettingParam[] = 
-        arrWithStringifiedSettings.map(this.StringToParam);
+        let settings = [];
 
-        let Settings = [];
-
-        for (let param of rawSettings)
+        for (let param of paramArr)
         {
             let newSetting = this.FromPluginParam(param);
-            Settings.push(newSetting);
+            settings.push(newSetting);
         }
 
-        return Settings;
+        return settings;
     }
 
     private static StringToParam(stringified: string): FontChangeSettingParam
