@@ -13,6 +13,9 @@ if you're using this plugin in your game (include the names and webpage links).
 Other contributors:
 FeniXTools - FeniXEngine Contributors
 
+If you want to edit this plugin, you may be better off editing and 
+building the source: https://github.com/CG-Tespy/CGT_NametagBasedFontChanger_MV
+
 @param Font Change Settings
 @type struct<CGTNaBaFoChFontChangeSettings>[]
 @default []
