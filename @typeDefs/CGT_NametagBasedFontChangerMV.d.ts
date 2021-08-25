@@ -21,6 +21,10 @@ declare namespace CGT
             "Nametag": string;
             "Font Family": string;
         }
+
+        let registeredSettings: FontChangeSettings[];
+        /** A map of the registered settings with the nametags as the keys */
+        let registeredSettingsMap: Map<string, FontChangeSettings>;
     }
     
 }

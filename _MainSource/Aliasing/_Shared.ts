@@ -15,15 +15,7 @@ export function FontAdjusterIsValid(fontAdjuster: FontChangeSettings)
 
 export function GetFontChangeSettingsFor(nameText: string)
 {
-    let matchingSettings: FontChangeSettings = undefined;
-    let fcSettings = NaBaFoCh.registeredSettings;
-    matchingSettings = ArrayEx.Find(fcSettings, SettingsMatchNametag);
-
-    function SettingsMatchNametag(settings: FontChangeSettings)
-    {
-        return settings.Nametag === nameText;
-    }
-    
-    return matchingSettings || FontChangeSettings.Null;
+    let settingsMap = CGT.NaBaFoCh.registeredSettingsMap;
+    return settingsMap.get(nameText) || FontChangeSettings.Null;
 }
 

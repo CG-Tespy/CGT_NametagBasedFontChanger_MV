@@ -15,14 +15,14 @@ let nameBoxChanges =
 {
     nameText: '',
     prevNameText: '',
-    DisplayedNewName: new Event(2),
+    NameTextUpdated: new Event(2),
     ShowedUp: new Event(),
     Deactivated: new Event(),
 
     initialize(parentWindow: Window_Message)
     {
         old.initialize.call(this, parentWindow);
-        this.DisplayedNewName.AddListener(this.OnNameTextChanged, this);
+        this.NameTextUpdated.AddListener(this.OnNameTextChanged, this);
         this.Deactivated.AddListener(this.OnDeactivated, this);
     },
 
@@ -52,10 +52,7 @@ let nameBoxChanges =
     UpdateNameText(newNameText: string): void
     {
         this.nameText = newNameText;
-
-        if (this.prevNameText !== this.nameText)
-            this.DisplayedNewName.Invoke(this.prevNameText, this.nameText);
-        
+        this.NameTextUpdated.Invoke(this.prevNameText, this.nameText);
         this.prevNameText = this.nameText;
     },
 

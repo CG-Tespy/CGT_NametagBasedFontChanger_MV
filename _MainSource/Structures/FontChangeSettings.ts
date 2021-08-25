@@ -2,8 +2,8 @@ import { FontChangeSettingParam } from './FontChangeSettingsParam';
 
 export class FontChangeSettings
 {
-    nametag: string;
-    fontFamily: string;
+    nametag: string = "";
+    fontFamily: string = "GameFont";
 
     get Nametag() { return this.nametag; }
     get FontFamily() { return this.fontFamily; }
@@ -31,6 +31,19 @@ export class FontChangeSettings
         }
 
         return settings;
+    }
+
+
+    static MapFromSettingsArr(settingsArr: FontChangeSettings[]): Map<string, FontChangeSettings>
+    {
+        let mapOfSettings = new Map<string, FontChangeSettings>();
+
+        for (let settingsEl of settingsArr)
+        {
+            mapOfSettings.set(settingsEl.Nametag, settingsEl);
+        }
+
+        return mapOfSettings;
     }
 
     private static StringToParam(stringified: string): FontChangeSettingParam

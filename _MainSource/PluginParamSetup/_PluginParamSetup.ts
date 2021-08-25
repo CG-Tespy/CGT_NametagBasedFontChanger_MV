@@ -9,3 +9,4 @@ let parsedParams = convertParameters(params);
 let arrOfExactParams: FontChangeSettingParam[] = parsedParams['Font Change Settings'];
 
 export let FontChangeSettingArr = FontChangeSettings.ArrFromPluginParamArr(arrOfExactParams);
+export let FontChangeSettingMap = FontChangeSettings.MapFromSettingsArr(FontChangeSettingArr);

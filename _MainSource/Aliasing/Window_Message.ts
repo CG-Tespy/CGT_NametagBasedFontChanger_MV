@@ -21,7 +21,7 @@ let messageBoxChanges =
     ListenForNameWindowEvents(): void
     {
         let nameWindow = Yanfly.nameWindow;
-        nameWindow.DisplayedNewName.AddListener(this.OnDisplayNewName, this);
+        nameWindow.NameTextUpdated.AddListener(this.OnDisplayNewName, this);
         nameWindow.Deactivated.AddListener(this.OnNameWindowDeactivated, this);
     },
 
