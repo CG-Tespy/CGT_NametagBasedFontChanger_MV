@@ -1,4 +1,3 @@
-import { ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
 
 let old = 
@@ -18,6 +17,7 @@ let nameBoxChanges =
     NameTextUpdated: new Event(2),
     ShowedUp: new Event(),
     Deactivated: new Event(),
+    fontAdjuster: FontChangeSettings.Default,
 
     initialize(parentWindow: Window_Message)
     {
@@ -35,12 +35,13 @@ let nameBoxChanges =
 
     OnNameTextChanged(oldName: string, newName: string)
     {
-        this.fontAdjuster = GetFontChangeSettingsFor(newName);
+        let entryManager = CGT.NaBaFoCh.activeEntryManager;
+        this.fontAdjuster = entryManager.GetEntryFor(newName);
     },
 
     OnDeactivated()
     {
-        this.fontAdjuster = FontChangeSettings.Null;
+        this.fontAdjuster = FontChangeSettings.Default;
     },
 
     refresh(nameText: string, position: PIXI.Point | PIXI.ObservablePoint): void
@@ -59,7 +60,8 @@ let nameBoxChanges =
     resetFontSettings()
     {
         old.resetFontSettings.call(this);
-        ChangeFontAsAppropriate.call(this);
+        FontChangeSettings.UpdateDefault();
+        this.fontAdjuster.ApplyTo(this.contents);
     },
 };
 

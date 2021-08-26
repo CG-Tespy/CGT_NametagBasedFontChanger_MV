@@ -11,9 +11,8 @@ declare namespace CGT
             static ArrFromPluginParamArr(paramArr: FontChangeSettingParam[]): FontChangeSettings[]
 
             ApplyTo(contents: Bitmap): void
-            IsAppliedTo(contents: Bitmap): boolean
 
-            static Null: Readonly<FontChangeSettings>;
+            static Default: FontChangeSettings;
         }
 
         interface FontChangeSettingParam
@@ -22,9 +21,22 @@ declare namespace CGT
             "Font Family": string;
         }
 
-        let registeredSettings: FontChangeSettings[];
-        /** A map of the registered settings with the nametags as the keys */
-        let registeredSettingsMap: Map<string, FontChangeSettings>;
+        class EntryManager 
+        {
+            /** 
+             * Gets the FontChangeSettings linked to the passed nametag. If such doesn't exist, 
+             * this returns FontChangeSettings.Default
+             */
+            GetEntryFor(nametag: string): FontChangeSettings;
+
+            /** 
+             * Registers a new entry with the passed nametag and font family. If there's already
+             * an entry with said nametag, the old one just gets updated to use the passed font family.
+             */
+            SetEntry(nametag: string, fontFamily: string);
+        }
+
+        let activeEntryManager: EntryManager;
     }
     
 }

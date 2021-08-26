@@ -1,5 +1,4 @@
 import { FontChangeSettings } from '../Structures/FontChangeSettings';
-import { ChangeFontAsAppropriate, GetFontChangeSettingsFor } from './_Shared';
 
 let old = 
 {
@@ -10,7 +9,7 @@ let old =
 
 let messageBoxChanges = 
 {
-    fontAdjuster: FontChangeSettings.Null,
+    fontAdjuster: FontChangeSettings.Default,
 
     createSubWindows(): void
     {
@@ -27,18 +26,20 @@ let messageBoxChanges =
 
     OnDisplayNewName(oldName: string, newName: string): void
     {
-        this.fontAdjuster = GetFontChangeSettingsFor(newName);
+        let entryManager = CGT.NaBaFoCh.activeEntryManager;
+        this.fontAdjuster = entryManager.GetEntryFor(newName);
     },
 
     OnNameWindowDeactivated(): void
     {
-        this.fontAdjuster = FontChangeSettings.Null;
+        this.fontAdjuster = FontChangeSettings.Default;
     },
 
     resetFontSettings(): void
     {
         old.resetFontSettings.call(this);
-        ChangeFontAsAppropriate.call(this);
+        FontChangeSettings.UpdateDefault();
+        this.fontAdjuster.ApplyTo(this.contents);
     },
     
 };

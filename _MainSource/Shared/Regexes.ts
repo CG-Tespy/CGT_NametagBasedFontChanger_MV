@@ -1,0 +1,1 @@
+export let pluginParamArgFormat = /".+"/g;

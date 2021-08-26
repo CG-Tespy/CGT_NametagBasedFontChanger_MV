@@ -2,14 +2,16 @@ import { FontChangeSettingParam } from './FontChangeSettingsParam';
 
 export class FontChangeSettings
 {
-    nametag: string = "";
-    fontFamily: string = "GameFont";
-
     get Nametag() { return this.nametag; }
     get FontFamily() { return this.fontFamily; }
 
     set Nametag(value) { this.nametag = value; }
     set FontFamily(value) { this.fontFamily = value; }
+
+    constructor(private nametag: string = "", private fontFamily: string = "GameFont")
+    {
+
+    }
 
     static FromPluginParam(param: FontChangeSettingParam): FontChangeSettings
     {
@@ -33,7 +35,6 @@ export class FontChangeSettings
         return settings;
     }
 
-
     static MapFromSettingsArr(settingsArr: FontChangeSettings[]): Map<string, FontChangeSettings>
     {
         let mapOfSettings = new Map<string, FontChangeSettings>();
@@ -46,21 +47,33 @@ export class FontChangeSettings
         return mapOfSettings;
     }
 
-    private static StringToParam(stringified: string): FontChangeSettingParam
-    {
-        return JSON.parse(stringified);
-    }
-
     ApplyTo(contents: Bitmap): void
     {
         contents.fontFace = this.fontFamily;
     }
 
-    IsAppliedTo(contents: Bitmap): boolean
-    {
-        return contents.fontFace === this.fontFamily;
-    }
+    static Default = new FontChangeSettings();
 
-    static Null = Object.freeze(new FontChangeSettings());
+    /** 
+     * Updates the default font to match the one set for the locale, as per 
+     * the Yanfly Message Core's settings 
+     * */
+    static UpdateDefault()
+    {
+        let setForChinese = $dataSystem.locale.match(/^zh/);
+        let setForKorean = $dataSystem.locale.match(/^ko/);
+        let setForEverythingElse = !setForChinese && !setForKorean;
+
+        let fontFamilyToApply = "GameFont";
+
+        if (setForChinese)
+            fontFamilyToApply = Yanfly.Param.MSGCNFontName;
+        else if (setForKorean)
+            fontFamilyToApply = Yanfly.Param.MSGKRFontName;
+        else if (setForEverythingElse)
+            fontFamilyToApply = Yanfly.Param.MSGFontName;
+
+        this.Default.FontFamily = fontFamilyToApply;
+    }
 
 }

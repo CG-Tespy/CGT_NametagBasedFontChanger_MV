@@ -15,4 +15,11 @@ declare class Window_NameBox extends Window_Base
 declare namespace Yanfly
 {
     let nameWindow: Window_NameBox;
+
+    namespace Param 
+    {
+        let MSGCNFontName: string;
+        let MSGKRFontName: string;
+        let MSGFontName: string;
+    }
 }

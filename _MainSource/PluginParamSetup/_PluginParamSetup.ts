@@ -1,12 +1,4 @@
-import { FontChangeSettings } from '../Structures/FontChangeSettings';
-import { convertParameters } from 'fenix-tools';
-import { FontChangeSettingParam } from '../Structures/FontChangeSettingsParam';
+import { EntryManager } from '../Structures/EntryManager';
 
-let pluginName = "CGT_NametagBasedFontChangerMV";
-
-let params = PluginManager.parameters(pluginName);
-let parsedParams = convertParameters(params);
-let arrOfExactParams: FontChangeSettingParam[] = parsedParams['Font Change Settings'];
-
-export let FontChangeSettingArr = FontChangeSettings.ArrFromPluginParamArr(arrOfExactParams);
-export let FontChangeSettingMap = FontChangeSettings.MapFromSettingsArr(FontChangeSettingArr);
+export let entryManager = new EntryManager();
+entryManager.SetFromPluginParams();
