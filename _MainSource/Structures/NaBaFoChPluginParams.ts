@@ -1,6 +1,6 @@
 import { pluginName } from "../Shared/Strings";
 import { FontChangeSettings } from "./FontChangeSettings";
-import { IPluginParamsRaw } from "./Interfaces/IPluginParamsRaw";
+import { IPluginParamsRaw as IPluginParamsRaw } from "./Interfaces/IPluginParamsRaw";
 import { RegexEntry } from "./RegexEntry";
 
 type IRegexEntry = CGT.NaBaFoCh.IRegexEntry;
@@ -34,14 +34,29 @@ export class PluginParams
     protected static GetRawSettingsParamArr(rawParams: IPluginParamsRaw)
     {
         let stringified = rawParams.FontChangeSettings;
-        let result: IFontChangeSettingParamRaw[] = JSON.parse(stringified);
+        let settingsAsStrings: string[] = JSON.parse(stringified);
+        let result: IFontChangeSettingParamRaw[] = [];
+
+        for (const settingStr of settingsAsStrings)
+        {
+            let parsed: IFontChangeSettingParamRaw = JSON.parse(settingStr);
+            result.push(parsed);
+        }
+
         return result;
     }
 
     protected static GetRawRegexEntryArr(rawParams: IPluginParamsRaw)
     {
         let stringified = rawParams.NametagFormats;
-        let result: IRegexEntryRaw[] = JSON.parse(stringified);
+        let entriesAsStrings: string[] = JSON.parse(stringified);
+        let result: IRegexEntryRaw[] = [];
+
+        for (const settingStr of entriesAsStrings)
+        {
+            let parsed: IRegexEntryRaw = JSON.parse(settingStr);
+            result.push(parsed);
+        }
         return result;
     }
 
