@@ -4,7 +4,7 @@ export default {
 	input: "./CGT_NametagBasedFontChangerMV_Main.js",
 	output: 
 	{
-		file: "./CGT_NametagBasedFontChangerMV.js",
+		file: "./CGT_NametagBasedFontChanger_MV.js",
 		format: 'iife',
 		freeze: false,
 	},

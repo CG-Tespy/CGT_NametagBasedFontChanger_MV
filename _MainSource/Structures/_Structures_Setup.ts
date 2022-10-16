@@ -1,2 +1,2 @@
-export * from "./FontChangeSettingsParam";
+export * from "./Interfaces/IFontChangeSettingParam";
 export * from "./FontChangeSettings";

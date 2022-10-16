@@ -1,30 +1,34 @@
-import { FontChangeSettingParam } from './FontChangeSettingsParam';
+import { defaultFontSize } from '../Shared/Numbers';
+import { defaultFont, emptyString } from '../Shared/Strings';
+import { IFontChangeSettingParamRaw } from './Interfaces/IFontChangeSettingParam';
 
 export class FontChangeSettings
 {
-    get Nametag() { return this.nametag; }
-    get FontFamily() { return this.fontFamily; }
-
-    set Nametag(value) { this.nametag = value; }
-    set FontFamily(value) { this.fontFamily = value; }
-
-    constructor(private nametag: string = "", private fontFamily: string = "GameFont")
-    {
-
-    }
-
-    static FromPluginParam(param: FontChangeSettingParam): FontChangeSettings
+    static FromPluginParam(param: IFontChangeSettingParamRaw): FontChangeSettings
     {
         let newSetting = new FontChangeSettings();
         newSetting.Nametag = param.Nametag;
-        newSetting.FontFamily = param["Font Family"];
-        
+        newSetting.FontFamily = param.FontFamily;
+        newSetting.FontSize = Number(param.FontSize);
+
         return newSetting;
     }
 
-    static ArrFromPluginParamArr(paramArr: FontChangeSettingParam[]): FontChangeSettings[]
+    get Nametag() { return this.nametag; }
+    private nametag: string = emptyString;
+    set Nametag(value) { this.nametag = value; }
+
+    get FontFamily() { return this.fontFamily; }
+    private fontFamily: string = defaultFont;
+    set FontFamily(value) { this.fontFamily = value; }
+
+    get FontSize() { return this.fontSize; }
+    private fontSize: number = defaultFontSize;
+    set FontSize(value) { this.fontSize = value || defaultFontSize; }
+
+    static ArrFromPluginParamArr(paramArr: IFontChangeSettingParamRaw[]): FontChangeSettings[]
     {
-        let settings = [];
+        let settings: FontChangeSettings[] = [];
 
         for (let param of paramArr)
         {
@@ -50,30 +54,37 @@ export class FontChangeSettings
     ApplyTo(contents: Bitmap): void
     {
         contents.fontFace = this.fontFamily;
+        contents.fontSize = this.fontSize;
     }
 
     static Default = new FontChangeSettings();
 
     /** 
-     * Updates the default font to match the one set for the locale, as per 
+     * Updates the default font family to match the one set for the locale, as per 
      * the Yanfly Message Core's settings 
      * */
     static UpdateDefault()
     {
-        let setForChinese = $dataSystem.locale.match(/^zh/);
-        let setForKorean = $dataSystem.locale.match(/^ko/);
-        let setForEverythingElse = !setForChinese && !setForKorean;
+        this.Default.FontFamily = defaultFont;
 
-        let fontFamilyToApply = "GameFont";
+        if (YanflyMessageCoreIsThere())
+        {
+            let setForChinese = $dataSystem.locale.match(/^zh/);
+            let setForKorean = $dataSystem.locale.match(/^ko/);
+            let setForEverythingElse = !setForChinese && !setForKorean;
 
-        if (setForChinese)
-            fontFamilyToApply = Yanfly.Param.MSGCNFontName;
-        else if (setForKorean)
-            fontFamilyToApply = Yanfly.Param.MSGKRFontName;
-        else if (setForEverythingElse)
-            fontFamilyToApply = Yanfly.Param.MSGFontName;
+            let fontFamilyToApply = emptyString;
 
-        this.Default.FontFamily = fontFamilyToApply;
+            if (setForChinese)
+                fontFamilyToApply = Yanfly.Param.MSGCNFontName;
+            else if (setForKorean)
+                fontFamilyToApply = Yanfly.Param.MSGKRFontName;
+            else if (setForEverythingElse)
+                fontFamilyToApply = Yanfly.Param.MSGFontName;
+
+            this.Default.FontFamily = fontFamilyToApply;
+        }
     }
 
 }
+

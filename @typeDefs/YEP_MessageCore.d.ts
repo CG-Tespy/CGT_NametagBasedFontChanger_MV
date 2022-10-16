@@ -22,4 +22,9 @@ declare namespace Yanfly
         let MSGKRFontName: string;
         let MSGFontName: string;
     }
+
+    namespace Message 
+    {
+        let version: number;
+    }
 }

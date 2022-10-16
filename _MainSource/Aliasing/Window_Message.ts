@@ -35,6 +35,11 @@ let messageBoxChanges =
         this.fontAdjuster = FontChangeSettings.Default;
     },
 
+    GetNonYanflyNametagFormatUsed(): void 
+    {
+
+    },
+
     resetFontSettings(): void
     {
         old.resetFontSettings.call(this);

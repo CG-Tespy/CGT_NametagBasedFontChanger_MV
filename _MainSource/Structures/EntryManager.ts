@@ -1,38 +1,30 @@
 import { FontChangeSettings } from './FontChangeSettings';
-import { convertParameters } from 'fenix-tools';
-import { FontChangeSettingParam } from './FontChangeSettingsParam';
+import { paramNames } from '../Shared/Objects';
+
+type IPluginParamsRaw = CGT.NaBaFoCh.IPluginParamsRaw;
 
 /** 
  * Manages the FontChangeSettings entries registered in the plugin. 
  * */
 export class EntryManager
 {
-    protected entries: Map<string, FontChangeSettings> = new Map<string, FontChangeSettings>();
-    get Entries() { return new Map<string, FontChangeSettings>(this.entries); }
-
     /** 
      * Resets this manager's entries based on what's registered in the Plugin Params.
      */
     SetFromPluginParams()
     {
         this.entries.clear();
-        let params = this.GetParams();
+        let params = CGT.NaBaFoCh.Params;
 
-        for (const paramEl of params)
+        for (const paramEl of params.FontChangeSettings)
         {
-            this.SetEntry(paramEl.Nametag, paramEl["Font Family"]);
+            this.SetEntry(paramEl.Nametag, paramEl[paramNames.FontFamily]);
         }
     }
 
-    protected GetParams()
-    {
-        let pluginName = "CGT_NametagBasedFontChangerMV";
-        let params = PluginManager.parameters(pluginName);
-        let parsedParams = convertParameters(params);
-        let arrOfExactParams: FontChangeSettingParam[] = parsedParams['Font Change Settings'];
-
-        return arrOfExactParams;
-    }
+    protected entries: Map<string, FontChangeSettings> = new Map<string, FontChangeSettings>();
+    get Entries() { return new Map<string, FontChangeSettings>(this.entries); }
+    // ^Since we don't want to let clients mess with the actual map directly
 
     SetEntry(nametag: string, fontFamily: string)
     {
@@ -55,7 +47,9 @@ export class EntryManager
 
     protected AddNewEntryFor(nametag: string, fontFamily: string)
     {
-        let newSettings = new FontChangeSettings(nametag, fontFamily);
+        let newSettings = new FontChangeSettings();
+        newSettings.Nametag = nametag;
+        newSettings.FontFamily = fontFamily;
         this.entries.set(nametag, newSettings);
     }
 

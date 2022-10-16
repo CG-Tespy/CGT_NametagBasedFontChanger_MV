@@ -1,4 +1,4 @@
 import { EntryManager } from '../Structures/EntryManager';
+import { PluginParams } from '../Structures/NaBaFoChPluginParams';
 
-export let entryManager = new EntryManager();
-entryManager.SetFromPluginParams();
+export let pluginParamsReady = PluginParams.Create();
